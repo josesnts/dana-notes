@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title> Support Call Logger</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+</head>
+<body class="bg-light">
+
+  <div class="container py-5">
+    <h2 class="mb-4">📞 Support Call Logger</h2>
+
+    <div class="card p-4 shadow-sm">
+      <div class="mb-3">
+        <label for="fieldSupportName" class="form-label">Support Name</label>
+        <input type="text" class="form-control" id="fieldSupportName" placeholder="e.g., John Dela Cruz" oninput="captureStartTime()">
+      </div>
+    <div class="mb-3">
+      <label for="position" class="form-label">Position of the Support</label>
+      <input type="text" class="form-control" id="position" placeholder="e.g., FS, ITSO, ITSM, BRM">
+    </div>
+      <div class="mb-3">
+        <label for="phoneNumber" class="form-label">Phone Number Dialed</label>
+        <input type="tel" class="form-control" id="phoneNumber" placeholder="e.g., 09171234567">
+      </div>
+      <div class="mb-3">
+        <label for="callDescription" class="form-label">Description</label>
+        <textarea class="form-control" id="callDescription" rows="3" placeholder="Brief description of the call..."></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="logCall()">Log Call</button>
+    </div>
+
+    <hr class="my-4">
+
+    <h4>📋 Call Logs</h4>
+    <ul class="list-group" id="callLogList"></ul>
+  </div>
+
+<script>
+  let startTime = null;
+
+  function captureStartTime() {
+    if (!startTime) {
+      const now = new Date();
+
+      const optionsDate = {
+        timeZone: 'America/New_York',
+        month: '2-digit',
+        day: '2-digit',
+        year: 'numeric'
+      };
+      const optionsTime = {
+        timeZone: 'America/New_York',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      };
+
+      const date = now.toLocaleDateString('en-US', optionsDate);
+      const time = now.toLocaleTimeString('en-US', optionsTime);
+
+      startTime = `[${date} - ${time} EDT]`;
+    }
+  }
+
+  function logCall() {
+    const name = document.getElementById('fieldSupportName').value.trim();
+    const position = document.getElementById('position').value.trim();
+    const phone = document.getElementById('phoneNumber').value.trim();
+    const desc = document.getElementById('callDescription').value.trim();
+    const logList = document.getElementById('callLogList');
+
+    if (!name || !phone || !desc) {
+      alert('Please fill in all fields: name, phone number, and description.');
+      return;
+    }
+
+    const logText = `${startTime || '[Time Unknown]'} - Command Center called ${position} ${name} via ${phone} - ${desc}`;
+
+    const logItem = document.createElement('li');
+    logItem.className = 'list-group-item d-flex justify-content-between align-items-start';
+
+    const logContent = document.createElement('span');
+    logContent.textContent = logText;
+
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'btn btn-sm btn-outline-secondary';
+    copyBtn.textContent = '📋 Copy';
+    copyBtn.onclick = () => {
+      navigator.clipboard.writeText(logText).then(() => {
+        copyBtn.textContent = '✅ Copied!';
+        setTimeout(() => copyBtn.textContent = '📋 Copy', 1500);
+      });
+    };
+
+    logItem.appendChild(logContent);
+    logItem.appendChild(copyBtn);
+    logList.prepend(logItem);
+
+    // Reset inputs and start time
+    document.getElementById('fieldSupportName').value = '';
+    document.getElementById('phoneNumber').value = '';
+    document.getElementById('callDescription').value = '';
+    startTime = null;
+  }
+</script>
+
+
+</body>
+</html>
